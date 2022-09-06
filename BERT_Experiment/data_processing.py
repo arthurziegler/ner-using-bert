@@ -3,8 +3,7 @@
 #############################################################
 
 import pandas as pd
-
-#import tokenizer from nltk that is able to separate text into sentences and tokens.
+import re
 from nltk import tokenize, download
 download('punkt')
 
@@ -51,10 +50,9 @@ def extract_spacy_tokens(spacy_dataframe):
 
 ### This function takes a text document that contains repeated spaces, new line character and wrong punctuation that could break sentence splits and cleans it.
 def clear_text(text_input_series):
-    # #Remove \n character and repeated whitespaces
-    clean_text = text_input_series.replace(r'(nº\.) ?','nº ', regex=True)
-    clean_text = clean_text.replace(r'\n',' ', regex=True)
-    clean_text = clean_text.replace(r'[ ]+', ' ', regex = True)
+    # #Remove line breaks, repeated whitespaces and changes punctuation after 'nº' for better sentence tokenization.
+    clean_text = re.sub('[ ]+|\n|\r', ' ', text_input_series)
+    clean_text = re.sub('(nº\.) ?','nº ', clean_text)
     return clean_text
 
 
