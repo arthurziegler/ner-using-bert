@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Training checkpoints
+BERT_Experiment/bert-base-portuguese-cased-ner-finetuned/
+BERT_Experiment/distilbert-finetuned-ner/
