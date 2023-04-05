@@ -51,8 +51,12 @@ def extract_spacy_tokens(spacy_dataframe):
 ### This function takes a text document that contains repeated spaces, new line character and wrong punctuation that could break sentence splits and cleans it.
 def clear_text(text_input_series):
     # #Remove line breaks, repeated whitespaces and changes punctuation after 'nº' for better sentence tokenization.
-    clean_text = re.sub('[ ]+|\n|\r', ' ', text_input_series)
+    clean_text = re.sub('\n', ' ', text_input_series)
+    clean_text = re.sub('\r', ' ', clean_text)
     clean_text = re.sub('(nº\.) ?','nº ', clean_text)
+    clean_text = re.sub('([ ]+\.) ?','.', clean_text)
+    clean_text = re.sub('RESOLVE','RESOLVE.', clean_text)
+    clean_text = re.sub('[ ]+', ' ', clean_text)
     return clean_text
 
 
@@ -104,3 +108,34 @@ def apply_iob_format(token_df):
             else:
                 token_df['Tag'].iloc[token_idx] = 'I-per'
     return token_df
+
+# This function takes as input the result of a NER Pipeline in HuggingFace, which is a dictionary of entities, and returns the full original sentence.
+def reformat_sentence(original_sentence, tagged_results):
+    og_sentence_pos = 0
+    tagged_sentence_pos = 0
+    formatted_results = []
+    for entity in tagged_results:
+        formatted_entity = ""
+        print(entity['word'])
+        for index_char, char in enumerate(entity['word']):
+            print(char, original_sentence[og_sentence_pos])
+            if char == original_sentence[og_sentence_pos]:
+                og_sentence_pos += 1
+                formatted_entity = formatted_entity + char
+            else:
+                print("Bad char:", char)
+                # #Look ahead and see if next char is equal to original
+                if entity['word'][index_char+1] == original_sentence[og_sentence_pos]:
+                    print("Found char in next pos")
+                    pass
+                # Else add the character to the formatted entity
+                else:
+                    og_sentence_pos += 2
+                    formatted_entity = formatted_entity + char
+
+        #print("Formatted:", formatted_entity)
+        formatted_result = entity.copy()
+        formatted_result['word'] = formatted_entity
+        formatted_results.append(formatted_result)
+    return formatted_results
+
