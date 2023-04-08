@@ -114,19 +114,22 @@ def reformat_sentence(original_sentence, tagged_results):
     og_sentence_pos = 0
     tagged_sentence_pos = 0
     formatted_results = []
+
+    #Loop through the list of entities to reformat their text to be equal to the original sentence.
+    next_word_start_index = 0
     for entity in tagged_results:
         formatted_entity = ""
-        print(entity['word'])
+        #print(entity['word'])
         for index_char, char in enumerate(entity['word']):
-            print(char, original_sentence[og_sentence_pos])
+            #print(char, original_sentence[og_sentence_pos])
             if char == original_sentence[og_sentence_pos]:
                 og_sentence_pos += 1
                 formatted_entity = formatted_entity + char
             else:
-                print("Bad char:", char)
+                #print("Bad char:", char)
                 # #Look ahead and see if next char is equal to original
                 if entity['word'][index_char+1] == original_sentence[og_sentence_pos]:
-                    print("Found char in next pos")
+                    #print("Found char in next pos")
                     pass
                 # Else add the character to the formatted entity
                 else:
@@ -136,6 +139,11 @@ def reformat_sentence(original_sentence, tagged_results):
         #print("Formatted:", formatted_entity)
         formatted_result = entity.copy()
         formatted_result['word'] = formatted_entity
+        formatted_result['start'] = next_word_start_index
+        formatted_result['end'] =  next_word_start_index + len(formatted_entity)
         formatted_results.append(formatted_result)
+
+        next_word_start_index = formatted_result['end'] + 1
+
     return formatted_results
 
