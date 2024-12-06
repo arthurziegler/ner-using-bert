@@ -64,16 +64,17 @@ def clear_text(text_input_series):
 ### This function splits a series of documents into a dataframe of phrases. 
 ### The resulting dataframes will contain columns with the sentence's text, the sentence's index and the original document's index.
 def split_text_sentences(text_input_series):
-    # #Split documents into phrases
+    # #Split documents into phrases and convert series to df (facilitates creating new columns)
     sentence_df = text_input_series.apply(lambda row: tokenize.sent_tokenize(row, language='portuguese'))
-
-    # #Turn series of list of phrases into series of phrases. Index will indicate which document it belongs to for now.
-    sentence_df = sentence_df.explode()
-    sentence_df = pd.DataFrame(sentence_df)
+    sentence_df = sentence_df.to_frame()
     
-    # Put sentece_df index as a column and the sentence id as another column
+    # #Turn series of list of phrases into series of phrases. Index will be the original documents id.
+    # We add a sentence id to each sentence as well. The id is determined by the order of sentences in each document.
+    sentence_df = sentence_df.explode('text')
+    sentence_df['sentence_id'] = sentence_df.groupby(sentence_df.index).cumcount()
+    
+    # Put document id as a column and the sentence id as another column
     sentence_df = sentence_df.reset_index()
-    sentence_df['SentenceID'] = sentence_df.index
     sentence_df.columns = ['document', 'sentence', 'sentence_id']
     return sentence_df
 
