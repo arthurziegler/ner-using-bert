@@ -131,3 +131,8 @@ dmypy.json
 # Training checkpoints
 BERT_Experiment/bert-base-portuguese-cased-ner-finetuned/
 BERT_Experiment/distilbert-finetuned-ner/
+
+# Large checkpoint files (>2GB limit for GitHub LFS)
+*/optimizer.pt
+*/scheduler.pt
+*/rng_state.pth
